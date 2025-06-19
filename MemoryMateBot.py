@@ -9,7 +9,7 @@ from stay_alive import keep_alive
 
 # === API KEYS ===
 TELEGRAM_BOT_TOKEN = "7795080227:AAF_W8T0B28ti7hA0JJVX8hJP2efI-Sm6o0"
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 
 # === Active AI users ===
 active_ai_users = {}  # {user_id: conversation history}
