@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+import os
+load_dotenv()
 import sqlite3
 import asyncio
 from datetime import datetime
@@ -8,8 +11,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from stay_alive import keep_alive
 
 # === API KEYS ===
-TELEGRAM_BOT_TOKEN = "7795080227:AAF_W8T0B28ti7hA0JJVX8hJP2efI-Sm6o0"
-OPENROUTER_API_KEY = "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"
+
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 # === Active AI users ===
 active_ai_users = {}  # {user_id: conversation history}
@@ -135,7 +140,7 @@ async def remember(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         print("Error in /remember:", e)
-        await update.message.reply_text("❌ Usage:\n Example: /remember Submit Assignment at 2025-06-20 06:00 PM")
+        await update.message.reply_text("❌ Usage:\n/remember Buy Milk at 2025-06-20 06:00 PM")
 
 # === /list ===
 async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -188,30 +193,23 @@ async def ai_message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     history = active_ai_users[user_id]
     history.append({"role": "user", "content": user_msg})
 
-    headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY.strip()}",
-        "Content-Type": "application/json"
-    }
-
-    data = {
-        "model": "openai/gpt-3.5-turbo",  # or "openai/gpt-4o" if allowed
-        "messages": history
-    }
-
     try:
+        headers = {
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "openai/gpt-3.5-turbo",
+            "messages": history
+        }
         response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
-        if response.status_code == 401:
-            await update.message.reply_text("❌ Invalid API Key. Please fix your configuration.")
-            return
         response.raise_for_status()
         reply = response.json()['choices'][0]['message']['content']
         history.append({"role": "assistant", "content": reply})
         await update.message.reply_text(reply)
-
-    except requests.exceptions.RequestException as e:
-        print("⚠️ AI request failed:", e)
-        await update.message.reply_text("❌ Something went wrong while contacting the AI.")
-
+    except Exception as e:
+        print("AI error:", e)
+        await update.message.reply_text("⚠️ AI error occurred.")
 
 # === Register Handlers ===
 app.add_handler(CommandHandler("start", start))
