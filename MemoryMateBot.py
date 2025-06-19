@@ -197,4 +197,11 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, ai_message_handl
 
 app.post_init = on_startup
 print("🤖 MemoryMateBot is running...")
-app.run_polling()
+# app.run_polling()
+
+app.run_webhook(
+    listen="0.0.0.0",
+    port=8080,
+    webhook_url="https://memorymatebot.onrender.com/"
+)
+
