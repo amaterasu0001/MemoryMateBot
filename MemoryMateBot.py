@@ -135,7 +135,7 @@ async def remember(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     except Exception as e:
         print("Error in /remember:", e)
-        await update.message.reply_text("❌ Usage:\n/remember Submit Assignment at 2025-06-20 06:00 PM")
+        await update.message.reply_text("❌ Usage:\n Example: /remember Submit Assignment at 2025-06-20 06:00 PM")
 
 # === /list ===
 async def list_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
